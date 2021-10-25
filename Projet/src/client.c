@@ -147,12 +147,12 @@ int main(int argc, char **argv) {
   }
   //envoie_recois_message(socketfd);
   //envoie_couleurs(socketfd, argv[1]);
-  sprintf(argv);
+  printf("%s", argv[0]);
   if (argv[0] == "message") {
     envoie_recois_message(socketfd);
   }
 
-  else if (argv[0] == "nom") { 
+  else if (argv[0] == "nom") {
     envoie_nom(socketfd);
   }
   
