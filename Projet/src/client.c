@@ -147,6 +147,7 @@ int main(int argc, char **argv) {
   }
   //envoie_recois_message(socketfd);
   //envoie_couleurs(socketfd, argv[1]);
+  sprintf(argv);
   if (argv[0] == "message") {
     envoie_recois_message(socketfd);
   }
