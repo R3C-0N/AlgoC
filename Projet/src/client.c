@@ -23,13 +23,15 @@
 
 int envoie_nom(int socketfd){
   char data[1024];
+  char hostname[128];
   // la réinitialisation de l'ensemble des données
   memset(data, 0, sizeof(data));
 
 
   //envoie nom machine
+  gethostname(hostname, 128);
   strcpy(data, "nom: ");
-  strcat(data, "gethostname()");
+  strcat(data, hostname);
 
   int write_status = write(socketfd, data, strlen(data));
   if ( write_status < 0 ) {
