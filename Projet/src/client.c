@@ -21,6 +21,23 @@
  * Il faut un argument : l'identifiant de la socket
  */
 
+int envoie_nom(int socketfd){
+  char data[1024];
+  // la réinitialisation de l'ensemble des données
+  memset(data, 0, sizeof(data));
+
+
+  //envoie nom machine
+  strcpy(data, "nom: ");
+  strcat(data, "gethostname()");
+
+  int write_status = write(socketfd, data, strlen(data));
+  if ( write_status < 0 ) {
+    perror("erreur ecriture");
+    exit(EXIT_FAILURE);
+  }
+}
+
 int envoie_recois_message(int socketfd) {
  
   char data[1024];
@@ -127,7 +144,19 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
   //envoie_recois_message(socketfd);
-  envoie_couleurs(socketfd, argv[1]);
+  //envoie_couleurs(socketfd, argv[1]);
+  if (argv[0] == "message") {
+    envoie_recois_message(socketfd);
+  }
 
+  else if (argv[0] == "nom") { 
+    envoie_nom(socketfd);
+  }
+  
+  else{
+    envoie_nom(socketfd);
+  }
+
+  printf("%s",argv[0]);
   close(socketfd);
 }
