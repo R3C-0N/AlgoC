@@ -69,6 +69,33 @@ int renvoie_nom(int client_socket_fd, char *data){
   }
 }
 
+struct Calcul
+{
+    char operateur;
+    int  nombre1;
+    int  nombre2;
+};
+
+int renvoie_calcul(int client_socket_fd, char *data){
+  struct Calcul calcul;
+  get_calcule_from_parameters(data, calcul);
+
+  int data_size = write (client_socket_fd, (void *) data, strlen(data));
+  if (data_size < 0) {
+    perror("erreur ecriture");
+    return(EXIT_FAILURE);
+  }
+}
+
+int get_calcule_from_parameters(char *parameters, struct Calcul *resultat){
+  char * tableau = strtok(parameters, " ");
+  printf("tableau:");
+  //resultat.operateur = tableau[0];
+  //resultat.nombre1 = 0;
+  //resultat.nombre2 = 0;
+ }
+
+
 /* accepter la nouvelle connection d'un client et lire les données
  * envoyées par le client. En suite, le serveur envoie un message
  * en retour
@@ -112,6 +139,9 @@ int recois_envoie_message(int socketfd) {
   else if (strcmp(code, "nom:") == 0) {
     renvoie_nom(client_socket_fd, data);
   }
+  else if (strcmp(code, "calcule:") == 0) {
+    renvoie_calcul(client_socket_fd, data);
+  }
 
   else {
     plot(data);
@@ -129,35 +159,38 @@ int main() {
 
   struct sockaddr_in server_addr, client_addr;
 
-  /*
-   * Creation d'une socket
-   */
-  socketfd = socket(AF_INET, SOCK_STREAM, 0);
-  if ( socketfd < 0 ) {
-    perror("Unable to open a socket");
-    return -1;
-  }
+  while(1){
+    /*
+     * Creation d'une socket
+     */
+    socketfd = socket(AF_INET, SOCK_STREAM, 0);
+    if ( socketfd < 0 ) {
+      perror("Unable to open a socket");
+      return -1;
+    }
 
-  int option = 1;
-  setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+    int option = 1;
+    setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 
-  //détails du serveur (adresse et port)
-  memset(&server_addr, 0, sizeof(server_addr));
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(PORT);
-  server_addr.sin_addr.s_addr = INADDR_ANY;
+    //détails du serveur (adresse et port)
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(PORT);
+    server_addr.sin_addr.s_addr = INADDR_ANY;
 
-  // Relier l'adresse à la socket
-  bind_status = bind(socketfd, (struct sockaddr *) &server_addr, sizeof(server_addr));
-  if (bind_status < 0 ) {
-    perror("bind");
-    return(EXIT_FAILURE);
-  }
+    // Relier l'adresse à la socket
+    bind_status = bind(socketfd, (struct sockaddr *) &server_addr, sizeof(server_addr));
+    if (bind_status < 0 ) {
+      perror("bind");
+      return(EXIT_FAILURE);
+    }
  
-  // Écouter les messages envoyés par le client
-  listen(socketfd, 10);
+      // Écouter les messages envoyés par le client
+    listen(socketfd, 10);
 
-  //Lire et répondre au client
-  recois_envoie_message(socketfd);
+    //Lire et répondre au client
+    recois_envoie_message(socketfd);
+  }
+
   return 0;
 }

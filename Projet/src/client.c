@@ -76,6 +76,30 @@ int envoie_recois_message(int socketfd) {
   return 0;
 }
 
+int envoie_operateur_numeros(int socketfd, char *argv[]) {
+ 
+  char data[1024];
+  char hostname[128];
+  // la réinitialisation de l'ensemble des données
+  memset(data, 0, sizeof(data));
+
+  int write_status = write(socketfd, data, strlen(data));
+  if ( write_status < 0 ) {
+    perror("erreur ecriture");
+    exit(EXIT_FAILURE);
+  }
+
+  // Demandez à l'utilisateur d'entrer un message
+  strcpy(data, "calcule: ");
+  strcat(data, argv[2]);
+  strcat(data, " ");
+  strcat(data, argv[3]);
+  strcat(data, " ");
+  strcat(data, argv[4]);
+
+  // lire les données de la socket
+}
+
 void analyse(char *pathname, char *data) {
   //compte de couleurs
   couleur_compteur *cc = analyse_bmp_image(pathname);
@@ -147,19 +171,21 @@ int main(int argc, char **argv) {
   }
   //envoie_recois_message(socketfd);
   //envoie_couleurs(socketfd, argv[1]);
-  printf("%s", argv[0]);
-  if (argv[0] == "message") {
+
+  if (!strcmp(argv[1],"message")) {
     envoie_recois_message(socketfd);
   }
 
-  else if (argv[0] == "nom") {
+  else if (!strcmp(argv[1], "nom")) {
     envoie_nom(socketfd);
+  }
+
+  else if (!strcmp(argv[1], "calcule")) {
+    envoie_operateur_numeros(socketfd, argv);
   }
   
   else{
     envoie_nom(socketfd);
   }
-
-  printf("%s",argv[0]);
   close(socketfd);
 }
