@@ -72,13 +72,17 @@ int renvoie_nom(int client_socket_fd, char *data){
 struct Calcul
 {
     char operateur;
-    int  nombre1;
-    int  nombre2;
+    float  nombre1;
+    float  nombre2;
+    float resultat;
 };
 
 int renvoie_calcul(int client_socket_fd, char *data){
   struct Calcul calcul;
-  get_calcule_from_parameters(data, calcul);
+  get_calcule_from_parameters(data, &calcul);
+
+  printf("%f\n", calcul.resultat);
+  printf("%c\n", calcul.operateur);
 
   int data_size = write (client_socket_fd, (void *) data, strlen(data));
   if (data_size < 0) {
@@ -87,12 +91,33 @@ int renvoie_calcul(int client_socket_fd, char *data){
   }
 }
 
-int get_calcule_from_parameters(char *parameters, struct Calcul *resultat){
+int get_calcule_from_parameters(char *parameters, struct Calcul* resultat){
   char * tableau = strtok(parameters, " ");
-  printf("tableau:");
-  //resultat.operateur = tableau[0];
-  //resultat.nombre1 = 0;
-  //resultat.nombre2 = 0;
+
+  tableau = strtok(NULL, " ");
+  (*resultat).operateur = tableau[0];
+
+  tableau = strtok(NULL, " ");
+  (*resultat).nombre1 = atof(tableau);
+
+  tableau = strtok(NULL, " ");
+  (*resultat).nombre2 = atof(tableau);
+
+  switch((*resultat).operateur) {
+    case '-':
+      (*resultat).resultat = (*resultat).nombre1 - (*resultat).nombre2;
+    break;
+    case '/':
+      (*resultat).resultat = (*resultat).nombre1 / (*resultat).nombre2;
+    break;
+    case '*':
+      (*resultat).resultat = (*resultat).nombre1 * (*resultat).nombre2;
+    break;
+    case '+':
+    default:
+      (*resultat).resultat = (*resultat).nombre1 + (*resultat).nombre2;
+    break;
+  }
  }
 
 
@@ -131,7 +156,6 @@ int recois_envoie_message(int socketfd) {
   printf ("Message recu: %s\n", data);
   char code[10];
   sscanf(data, "%s", code);
-
   //Si le message commence par le mot: 'message:' 
   if (strcmp(code, "message:") == 0) {
     renvoie_message(client_socket_fd, data);
@@ -146,7 +170,7 @@ int recois_envoie_message(int socketfd) {
   else {
     plot(data);
   }
-
+;
   //fermer le socket 
   close(socketfd);
 }

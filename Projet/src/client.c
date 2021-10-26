@@ -83,12 +83,6 @@ int envoie_operateur_numeros(int socketfd, char *argv[]) {
   // la réinitialisation de l'ensemble des données
   memset(data, 0, sizeof(data));
 
-  int write_status = write(socketfd, data, strlen(data));
-  if ( write_status < 0 ) {
-    perror("erreur ecriture");
-    exit(EXIT_FAILURE);
-  }
-
   // Demandez à l'utilisateur d'entrer un message
   strcpy(data, "calcule: ");
   strcat(data, argv[2]);
@@ -98,6 +92,11 @@ int envoie_operateur_numeros(int socketfd, char *argv[]) {
   strcat(data, argv[4]);
 
   // lire les données de la socket
+  int write_status = write(socketfd, data, strlen(data));
+  if ( write_status < 0 ) {
+    perror("erreur ecriture");
+    exit(EXIT_FAILURE);
+  }
 }
 
 void analyse(char *pathname, char *data) {
