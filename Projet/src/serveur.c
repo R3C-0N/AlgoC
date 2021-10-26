@@ -61,6 +61,94 @@ int renvoie_message(int client_socket_fd, char *data) {
   }
 }
 
+int renvoie_nom(int client_socket_fd, char *data){
+  int data_size = write (client_socket_fd, (void *) data, strlen(data));
+  if (data_size < 0) {
+    perror("erreur ecriture");
+    return(EXIT_FAILURE);
+  }
+}
+
+struct Calcul
+{
+    char operateur;
+    float  nombre1;
+    float  nombre2;
+    float resultat;
+};
+
+int renvoie_calcul(int client_socket_fd, char *data){
+  struct Calcul calcul;
+  get_calcule_from_parameters(data, &calcul);
+
+  printf("calcule: %.2f\n", calcul.resultat);
+
+  int data_size = write (client_socket_fd, (void *) data, strlen(data));
+  if (data_size < 0) {
+    perror("erreur ecriture");
+    return(EXIT_FAILURE);
+  }
+}
+
+int get_calcule_from_parameters(char *parameters, struct Calcul* resultat){
+  char * tableau = strtok(parameters, " ");
+
+  tableau = strtok(NULL, " ");
+  (*resultat).operateur = tableau[0];
+
+  tableau = strtok(NULL, " ");
+  (*resultat).nombre1 = atof(tableau);
+
+  tableau = strtok(NULL, " ");
+  (*resultat).nombre2 = atof(tableau);
+
+  switch((*resultat).operateur) {
+    case '-':
+      (*resultat).resultat = (*resultat).nombre1 - (*resultat).nombre2;
+    break;
+    case '/':
+      (*resultat).resultat = (*resultat).nombre1 / (*resultat).nombre2;
+    break;
+    case '*':
+      (*resultat).resultat = (*resultat).nombre1 * (*resultat).nombre2;
+    break;
+    case '+':
+    default:
+      (*resultat).resultat = (*resultat).nombre1 + (*resultat).nombre2;
+    break;
+  }
+ }
+
+ int recois_couleurs(int client_socket_fd, char *data){
+  FILE *fp;
+  printf("couleurs: ");
+
+  char * tableau = strtok(data, " ");
+  tableau = strtok(NULL, " ");
+  int nb = atoi(tableau);
+  char couleurs[1000];
+  int i = 0;
+
+  while(tableau != NULL){
+    strcat(couleurs, tableau);
+    strcat(couleurs, " ");
+    printf("%s ", tableau);
+    tableau = strtok(NULL, " ");
+    i++;
+  }
+
+  fp = fopen("./tmp/couleurs.txt", "w+");
+  fputs(couleurs, fp);
+  fclose(fp);
+
+  int data_size = write (client_socket_fd, (void *) data, strlen(data));
+  if (data_size < 0) {
+    perror("erreur ecriture");
+    return(EXIT_FAILURE);
+ }
+}
+
+
 /* accepter la nouvelle connection d'un client et lire les données
  * envoyées par le client. En suite, le serveur envoie un message
  * en retour
@@ -96,15 +184,24 @@ int recois_envoie_message(int socketfd) {
   printf ("Message recu: %s\n", data);
   char code[10];
   sscanf(data, "%s", code);
-
   //Si le message commence par le mot: 'message:' 
   if (strcmp(code, "message:") == 0) {
     renvoie_message(client_socket_fd, data);
   }
+  else if (strcmp(code, "nom:") == 0) {
+    renvoie_nom(client_socket_fd, data);
+  }
+  else if (strcmp(code, "calcule:") == 0) {
+    renvoie_calcul(client_socket_fd, data);
+  }
+  else if (strcmp(code, "couleurs:") == 0) {
+    recois_couleurs(client_socket_fd, data);
+  }
+
   else {
     plot(data);
   }
-
+;
   //fermer le socket 
   close(socketfd);
 }
@@ -117,36 +214,38 @@ int main() {
 
   struct sockaddr_in server_addr, client_addr;
 
-  /*
-   * Creation d'une socket
-   */
-  socketfd = socket(AF_INET, SOCK_STREAM, 0);
-  if ( socketfd < 0 ) {
-    perror("Unable to open a socket");
-    return -1;
-  }
+  while(1){
+    /*
+     * Creation d'une socket
+     */
+    socketfd = socket(AF_INET, SOCK_STREAM, 0);
+    if ( socketfd < 0 ) {
+      perror("Unable to open a socket");
+      return -1;
+    }
 
-  int option = 1;
-  setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
+    int option = 1;
+    setsockopt(socketfd, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
 
-  //détails du serveur (adresse et port)
-  memset(&server_addr, 0, sizeof(server_addr));
-  server_addr.sin_family = AF_INET;
-  server_addr.sin_port = htons(PORT);
-  server_addr.sin_addr.s_addr = INADDR_ANY;
+    //détails du serveur (adresse et port)
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_port = htons(PORT);
+    server_addr.sin_addr.s_addr = INADDR_ANY;
 
-  // Relier l'adresse à la socket
-  bind_status = bind(socketfd, (struct sockaddr *) &server_addr, sizeof(server_addr));
-  if (bind_status < 0 ) {
-    perror("bind");
-    return(EXIT_FAILURE);
-  }
+    // Relier l'adresse à la socket
+    bind_status = bind(socketfd, (struct sockaddr *) &server_addr, sizeof(server_addr));
+    if (bind_status < 0 ) {
+      perror("bind");
+      return(EXIT_FAILURE);
+    }
  
-  // Écouter les messages envoyés par le client
-  listen(socketfd, 10);
+      // Écouter les messages envoyés par le client
+    listen(socketfd, 10);
 
-  //Lire et répondre au client
-  recois_envoie_message(socketfd);
+    //Lire et répondre au client
+    recois_envoie_message(socketfd);
+  }
 
   return 0;
 }
