@@ -81,8 +81,7 @@ int renvoie_calcul(int client_socket_fd, char *data){
   struct Calcul calcul;
   get_calcule_from_parameters(data, &calcul);
 
-  printf("%f\n", calcul.resultat);
-  printf("%c\n", calcul.operateur);
+  printf("calcule: %.2f\n", calcul.resultat);
 
   int data_size = write (client_socket_fd, (void *) data, strlen(data));
   if (data_size < 0) {
@@ -119,6 +118,35 @@ int get_calcule_from_parameters(char *parameters, struct Calcul* resultat){
     break;
   }
  }
+
+ int recois_couleurs(int client_socket_fd, char *data){
+  FILE *fp;
+  printf("couleurs: ");
+
+  char * tableau = strtok(data, " ");
+  tableau = strtok(NULL, " ");
+  int nb = atoi(tableau);
+  char couleurs[1000];
+  int i = 0;
+
+  while(tableau != NULL){
+    strcat(couleurs, tableau);
+    strcat(couleurs, " ");
+    printf("%s ", tableau);
+    tableau = strtok(NULL, " ");
+    i++;
+  }
+
+  fp = fopen("./tmp/couleurs.txt", "w+");
+  fputs(couleurs, fp);
+  fclose(fp);
+
+  int data_size = write (client_socket_fd, (void *) data, strlen(data));
+  if (data_size < 0) {
+    perror("erreur ecriture");
+    return(EXIT_FAILURE);
+ }
+}
 
 
 /* accepter la nouvelle connection d'un client et lire les données
@@ -165,6 +193,9 @@ int recois_envoie_message(int socketfd) {
   }
   else if (strcmp(code, "calcule:") == 0) {
     renvoie_calcul(client_socket_fd, data);
+  }
+  else if (strcmp(code, "couleurs:") == 0) {
+    recois_couleurs(client_socket_fd, data);
   }
 
   else {

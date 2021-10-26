@@ -99,6 +99,35 @@ int envoie_operateur_numeros(int socketfd, char *argv[]) {
   }
 }
 
+int envoie_couleurs(int socketfd, char *argv[]) {
+  char data[1024];
+  memset(data, 0, sizeof(data));
+  int nb = atoi(argv[2]);
+
+  if (nb > 30)
+  {
+    perror("Nombre de couleurs trop grand");
+    exit(EXIT_FAILURE);
+  }
+
+  strcpy(data, "couleurs: ");
+  int i;
+  for (i = 3; i < nb + 3; ++i)
+  {
+    printf("%i. %s \n", i-2, argv[i]);
+    strcat(data, argv[i]);
+    strcat(data, " ");
+  }
+
+  int write_status = write(socketfd, data, strlen(data));
+  if ( write_status < 0 ) {
+    perror("erreur ecriture");
+    exit(EXIT_FAILURE);
+  }
+
+  return 0;
+}
+
 void analyse(char *pathname, char *data) {
   //compte de couleurs
   couleur_compteur *cc = analyse_bmp_image(pathname);
@@ -126,7 +155,7 @@ void analyse(char *pathname, char *data) {
   data[strlen(data)-1] = '\0';
 }
 
-int envoie_couleurs(int socketfd, char *pathname) {
+int envoie_images(int socketfd, char *pathname) {
   char data[1024];
   memset(data, 0, sizeof(data));
   analyse(pathname, data);
@@ -181,6 +210,10 @@ int main(int argc, char **argv) {
 
   else if (!strcmp(argv[1], "calcule")) {
     envoie_operateur_numeros(socketfd, argv);
+  }
+
+  else if (!strcmp(argv[1], "couleurs")) {
+    envoie_couleurs(socketfd, argv);
   }
   
   else{
