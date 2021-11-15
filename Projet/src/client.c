@@ -114,7 +114,34 @@ int envoie_couleurs(int socketfd, char *argv[]) {
   int i;
   for (i = 3; i < nb + 3; ++i)
   {
-    printf("%i. %s \n", i-2, argv[i]);
+    strcat(data, argv[i]);
+    strcat(data, " ");
+  }
+
+  int write_status = write(socketfd, data, strlen(data));
+  if ( write_status < 0 ) {
+    perror("erreur ecriture");
+    exit(EXIT_FAILURE);
+  }
+
+  return 0;
+}
+
+int envoie_balises(int socketfd, char *argv[]) {
+  char data[1024];
+  memset(data, 0, sizeof(data));
+  int nb = atoi(argv[2]);
+
+  if (nb > 30)
+  {
+    perror("Nombre de balises trop grand");
+    exit(EXIT_FAILURE);
+  }
+
+  strcpy(data, "balises: ");
+  int i;
+  for (i = 3; i < nb + 3; ++i)
+  {
     strcat(data, argv[i]);
     strcat(data, " ");
   }
@@ -130,7 +157,7 @@ int envoie_couleurs(int socketfd, char *argv[]) {
 
 void analyse(char *pathname, char *data) {
   //compte de couleurs
-  couleur_compteur *cc = analyse_bmp_image(pathname);
+  couleur_compteur *cc = 0;//analyse_bmp_image(pathname);
 
   int count;
   strcpy(data, "couleurs: ");
@@ -198,7 +225,6 @@ int main(int argc, char **argv) {
     exit(EXIT_FAILURE);
   }
   //envoie_recois_message(socketfd);
-  //envoie_couleurs(socketfd, argv[1]);
 
   if (!strcmp(argv[1],"message")) {
     envoie_recois_message(socketfd);
@@ -214,6 +240,10 @@ int main(int argc, char **argv) {
 
   else if (!strcmp(argv[1], "couleurs")) {
     envoie_couleurs(socketfd, argv);
+  }
+
+  else if (!strcmp(argv[1], "balises")) {
+    envoie_balises(socketfd, argv);
   }
   
   else{

@@ -136,9 +136,40 @@ int get_calcule_from_parameters(char *parameters, struct Calcul* resultat){
     tableau = strtok(NULL, " ");
     i++;
   }
+  printf("\n");
 
   fp = fopen("./tmp/couleurs.txt", "w+");
   fputs(couleurs, fp);
+  fclose(fp);
+
+  int data_size = write (client_socket_fd, (void *) data, strlen(data));
+  if (data_size < 0) {
+    perror("erreur ecriture");
+    return(EXIT_FAILURE);
+ }
+}
+
+ int recois_balises(int client_socket_fd, char *data){
+  FILE *fp;
+  printf("balises: ");
+
+  char * tableau = strtok(data, " ");
+  tableau = strtok(NULL, " ");
+  int nb = atoi(tableau);
+  char balises[1000];
+  int i = 0;
+
+  while(tableau != NULL){
+    strcat(balises, tableau);
+    strcat(balises, " ");
+    printf("%s ", tableau);
+    tableau = strtok(NULL, " ");
+    i++;
+  }
+  printf("\n");
+
+  fp = fopen("./tmp/balises.txt", "w+");
+  fputs(balises, fp);
   fclose(fp);
 
   int data_size = write (client_socket_fd, (void *) data, strlen(data));
@@ -196,6 +227,9 @@ int recois_envoie_message(int socketfd) {
   }
   else if (strcmp(code, "couleurs:") == 0) {
     recois_couleurs(client_socket_fd, data);
+  }
+  else if (strcmp(code, "balises:") == 0) {
+    recois_balises(client_socket_fd, data);
   }
 
   else {
