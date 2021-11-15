@@ -155,20 +155,22 @@ int envoie_balises(int socketfd, char *argv[]) {
   return 0;
 }
 
-void analyse(char *pathname, char *data) {
+void analyse(char *pathname, char *data, char *nb) {
   //compte de couleurs
-  couleur_compteur *cc = 0;//analyse_bmp_image(pathname);
+  int intNb = atoi(nb);
+  couleur_compteur *cc = analyse_bmp_image(pathname);
 
   int count;
-  strcpy(data, "couleurs: ");
-  char temp_string[10] = "10,";
-  if (cc->size < 10) {
+  strcpy(data, "analyse: ");
+  char temp_string[intNb];
+  sprintf(temp_string, "%d,", intNb);
+  if (cc->size < intNb) {
     sprintf(temp_string, "%d,", cc->size);
   }
   strcat(data, temp_string);
   
-  //choisir 10 couleurs
-  for (count = 1; count < 11 && cc->size - count >0; count++) {
+  //choisir intNb couleurs
+  for (count = 1; count < intNb+1 && cc->size - count >0; count++) {
     if(cc->compte_bit ==  BITS32) {
       sprintf(temp_string, "#%02x%02x%02x,", cc->cc.cc24[cc->size-count].c.rouge,cc->cc.cc32[cc->size-count].c.vert,cc->cc.cc32[cc->size-count].c.bleu);
     }
@@ -182,10 +184,20 @@ void analyse(char *pathname, char *data) {
   data[strlen(data)-1] = '\0';
 }
 
-int envoie_images(int socketfd, char *pathname) {
+int envoie_images(int socketfd, char *nb, char *pathname) {
   char data[1024];
+  int intNb = atoi(nb);
   memset(data, 0, sizeof(data));
-  analyse(pathname, data);
+
+  if(intNb>30){
+    perror("Nombre de couleurs demande trop grand");
+    exit(EXIT_FAILURE);
+  }
+
+  analyse(pathname, data, nb);
+
+
+  printf("%s\n", data);
   
   int write_status = write(socketfd, data, strlen(data));
   if ( write_status < 0 ) {
@@ -245,9 +257,10 @@ int main(int argc, char **argv) {
   else if (!strcmp(argv[1], "balises")) {
     envoie_balises(socketfd, argv);
   }
-  
-  else{
-    envoie_nom(socketfd);
+
+  else {
+    envoie_images(socketfd, argv[1], argv[2]);
   }
+
   close(socketfd);
 }

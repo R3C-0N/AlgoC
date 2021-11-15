@@ -17,21 +17,23 @@
 #include "serveur.h"
 
 void plot(char *data) {
-
   //Extraire le compteur et les couleurs RGB 
   FILE *p = popen("gnuplot -persist", "w");
-  printf("Plot");
+  printf("Plot\n");
   int count = 0;
   int n;
   char *saveptr = NULL;
   char *str = data;
+  char strNb[] = {data[9], data[10]};
+  int nb = atoi(strNb);
+  fprintf(p, "set terminal x11\n");
   fprintf(p, "set xrange [-15:15]\n");
   fprintf(p, "set yrange [-15:15]\n");
   fprintf(p, "set style fill transparent solid 0.9 noborder\n");
-  fprintf(p, "set title 'Top 10 colors'\n");
+  fprintf(p, "set title 'Top %s colors'\n", strNb);
   fprintf(p, "plot '-' with circles lc rgbcolor variable\n");
   while(1) {
-    char *token = strtok_r(str, ",", &saveptr);
+    char *token = strtok_r(str, ",", & saveptr);
     if (token == NULL) {
       break;
     }
@@ -41,11 +43,14 @@ void plot(char *data) {
     }
     else {
       // Le numéro 36, parceque 360° (cercle) / 10 couleurs = 36
-      fprintf(p, "0 0 10 %d %d 0x%s\n", (count-1)*36, count*36, token+1);
+      printf("%d %s\n", count, token);
+      printf("0 0 10 %d %d 0x%s\n", (count-1)*360/nb, count*360/nb, token+1);
+      fprintf(p, "0 0 10 %d %d 0x%s\n", (count-1)*360/nb, count*360/nb, token+1);
     }
     count++;
   }
   fprintf(p, "e\n");
+
   printf("Plot: FIN\n");
   pclose(p);
 }
@@ -248,7 +253,7 @@ int main() {
 
   struct sockaddr_in server_addr, client_addr;
 
-  while(1){
+  //while(1){
     /*
      * Creation d'une socket
      */
@@ -279,7 +284,7 @@ int main() {
 
     //Lire et répondre au client
     recois_envoie_message(socketfd);
-  }
+ // }
 
   return 0;
 }

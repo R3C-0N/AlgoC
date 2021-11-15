@@ -62,7 +62,7 @@ void analyse(char *pathname, char *data) {
   couleur_compteur *cc = analyse_bmp_image(pathname);
 
   int count;
-  strcpy(data, "couleurs: ");
+  strcpy(data, "analyse: ");
   char temp_string[10] = "10,";
   if (cc->size < 10) {
     sprintf(temp_string, "%d,", cc->size);
