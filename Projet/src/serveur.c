@@ -43,8 +43,6 @@ void plot(char *data) {
     }
     else {
       // Le numéro 36, parceque 360° (cercle) / 10 couleurs = 36
-      printf("%d %s\n", count, token);
-      printf("0 0 10 %d %d 0x%s\n", (count-1)*360/nb, count*360/nb, token+1);
       fprintf(p, "0 0 10 %d %d 0x%s\n", (count-1)*360/nb, count*360/nb, token+1);
     }
     count++;
@@ -58,7 +56,9 @@ void plot(char *data) {
 /* renvoyer un message (*data) au client (client_socket_fd)
  */
 int renvoie_message(int client_socket_fd, char *data) {
-  int data_size = write (client_socket_fd, (void *) data, strlen(data));
+  char encoded_data[1024];
+  encode_JSON(data, encoded_data);
+  int data_size = write (client_socket_fd, encoded_data, strlen(encoded_data));
       
   if (data_size < 0) {
     perror("erreur ecriture");
@@ -67,7 +67,10 @@ int renvoie_message(int client_socket_fd, char *data) {
 }
 
 int renvoie_nom(int client_socket_fd, char *data){
-  int data_size = write (client_socket_fd, (void *) data, strlen(data));
+  char encoded_data[1024];
+  encode_JSON(data, encoded_data);
+  int data_size = write(client_socket_fd, encoded_data, strlen(encoded_data));
+  
   if (data_size < 0) {
     perror("erreur ecriture");
     return(EXIT_FAILURE);
@@ -101,10 +104,11 @@ int get_calcule_from_parameters(char *parameters, struct Calcul* resultat){
   tableau = strtok(NULL, " ");
   (*resultat).operateur = tableau[0];
 
-  tableau = strtok(NULL, " ");
+  tableau = strtok(tableau, ",");
+  tableau = strtok(NULL, ",");
   (*resultat).nombre1 = atof(tableau);
 
-  tableau = strtok(NULL, " ");
+  tableau = strtok(NULL, ",");
   (*resultat).nombre2 = atof(tableau);
 
   switch((*resultat).operateur) {
@@ -126,22 +130,17 @@ int get_calcule_from_parameters(char *parameters, struct Calcul* resultat){
 
  int recois_couleurs(int client_socket_fd, char *data){
   FILE *fp;
-  printf("couleurs: ");
 
   char * tableau = strtok(data, " ");
   tableau = strtok(NULL, " ");
-  int nb = atoi(tableau);
+  tableau = strtok(tableau, ",");
+
   char couleurs[1000];
-  int i = 0;
 
   while(tableau != NULL){
-    strcat(couleurs, tableau);
-    strcat(couleurs, " ");
-    printf("%s ", tableau);
-    tableau = strtok(NULL, " ");
-    i++;
+    sprintf(couleurs, "%s %s", couleurs, tableau);
+    tableau = strtok(NULL, ",");
   }
-  printf("\n");
 
   fp = fopen("./tmp/couleurs.txt", "w+");
   fputs(couleurs, fp);
@@ -156,22 +155,17 @@ int get_calcule_from_parameters(char *parameters, struct Calcul* resultat){
 
  int recois_balises(int client_socket_fd, char *data){
   FILE *fp;
-  printf("balises: ");
 
   char * tableau = strtok(data, " ");
   tableau = strtok(NULL, " ");
-  int nb = atoi(tableau);
+  tableau = strtok(tableau, ",");
+
   char balises[1000];
-  int i = 0;
 
   while(tableau != NULL){
-    strcat(balises, tableau);
-    strcat(balises, " ");
-    printf("%s ", tableau);
-    tableau = strtok(NULL, " ");
-    i++;
+    sprintf(balises, "%s %s", balises, tableau);
+    tableau = strtok(NULL, ",");
   }
-  printf("\n");
 
   fp = fopen("./tmp/balises.txt", "w+");
   fputs(balises, fp);
@@ -192,6 +186,7 @@ int get_calcule_from_parameters(char *parameters, struct Calcul* resultat){
 int recois_envoie_message(int socketfd) {
   struct sockaddr_in client_addr;
   char data[1024];
+  char decoded_data[1024];
 
   int client_addr_len = sizeof(client_addr);
  
@@ -204,45 +199,102 @@ int recois_envoie_message(int socketfd) {
 
   // la réinitialisation de l'ensemble des données
   memset(data, 0, sizeof(data));
+  //memset(decoded_data, 0, sizeof(decoded_data));
 
   //lecture de données envoyées par un client
   int data_size = read (client_socket_fd, (void *) data, sizeof(data));
-      
+  
+  printf ("Message reçu: %s\n", data);
   if (data_size < 0) {
     perror("erreur lecture");
     return(EXIT_FAILURE);
   }
+
+  decode_JSON(data, decoded_data);
   
   /*
    * extraire le code des données envoyées par le client. 
    * Les données envoyées par le client peuvent commencer par le mot "message :" ou un autre mot.
    */
-  printf ("Message recu: %s\n", data);
+  printf ("Message décodé: %s\n", decoded_data);
   char code[10];
-  sscanf(data, "%s", code);
+  sscanf(decoded_data, "%s", code);
   //Si le message commence par le mot: 'message:' 
   if (strcmp(code, "message:") == 0) {
-    renvoie_message(client_socket_fd, data);
+    renvoie_message(client_socket_fd, decoded_data);
   }
   else if (strcmp(code, "nom:") == 0) {
-    renvoie_nom(client_socket_fd, data);
+    renvoie_nom(client_socket_fd, decoded_data);
   }
   else if (strcmp(code, "calcule:") == 0) {
-    renvoie_calcul(client_socket_fd, data);
+    renvoie_calcul(client_socket_fd, decoded_data);
   }
   else if (strcmp(code, "couleurs:") == 0) {
-    recois_couleurs(client_socket_fd, data);
+    recois_couleurs(client_socket_fd, decoded_data);
   }
   else if (strcmp(code, "balises:") == 0) {
-    recois_balises(client_socket_fd, data);
+    recois_balises(client_socket_fd, decoded_data);
   }
 
   else {
-    plot(data);
+    plot(decoded_data);
   }
 ;
   //fermer le socket 
   close(socketfd);
+}
+
+
+int decode_JSON(char *data, char *decoded_data){
+  char data2[strlen(data)+1];
+  strcpy(data2, data);
+
+  // Isoler code d'instruction
+  char * decoder_code = strtok(data, ",");
+  decoder_code = strtok(decoder_code, " : ");
+  decoder_code = strtok(NULL, " : ");
+
+  // Supprimer les guillemets
+  memmove(decoder_code, decoder_code+1, strlen(decoder_code));
+  decoder_code[strlen(decoder_code)-1]='\0';
+
+  // Ajout de l'instruction a la chaine décodé
+  sprintf(decoded_data, "%s: ", decoder_code);
+
+  // Isoler les valeurs
+  char * decoder_valeurs = strtok(data2, "[");
+  decoder_valeurs = strtok(NULL, "[");
+
+  // Isoler chaque valeurs entre elles
+  char * decoder_valeur = strtok(decoder_valeurs, "\", \"");
+  while(decoder_valeur!=NULL) {
+    sprintf(decoded_data, "%s%s,", decoded_data, decoder_valeur);
+    decoder_valeur = strtok(NULL, "\", \"");
+  }
+  decoded_data[strlen(decoded_data)-4]='\0';
+  return 1;
+}
+
+int encode_JSON(char* data, char* encoded_data){
+  printf("Message à encoder: %s\n", data);
+  
+  char * decoder = strtok(data, ": ");
+  sprintf(encoded_data, "{\"code\" : \"%s\", \"valeurs\" : [ ", decoder);
+
+  decoder = strtok(NULL, ": ");
+  decoder = strtok(decoder, ",");
+
+  while(decoder != NULL){
+    sprintf(encoded_data, "%s\"%s\", ", encoded_data, decoder);
+    decoder = strtok(NULL, ",");
+  }
+  encoded_data[strlen(encoded_data)-1] = '\0';
+  encoded_data[strlen(encoded_data)-1] = ' ';
+  
+  strcat(encoded_data, "]}");
+
+  printf("Message encodé envoyé: %s\n", encoded_data);
+  return 1;
 }
 
 int main() {
@@ -283,6 +335,7 @@ int main() {
     listen(socketfd, 10);
 
     //Lire et répondre au client
+
     recois_envoie_message(socketfd);
  // }
 

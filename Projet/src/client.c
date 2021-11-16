@@ -16,35 +16,56 @@
 #include "client.h"
 #include "bmp.h"
 
-/* 
- * Fonction d'envoi et de réception de messages
- * Il faut un argument : l'identifiant de la socket
- */
-
 int envoie_nom(int socketfd){
   char data[1024];
   char hostname[128];
   // la réinitialisation de l'ensemble des données
   memset(data, 0, sizeof(data));
 
-
   //envoie nom machine
   gethostname(hostname, 128);
   strcpy(data, "nom: ");
   strcat(data, hostname);
 
-  int write_status = write(socketfd, data, strlen(data));
+  char encoded_data[512];
+  encode_JSON(data, encoded_data);
+
+  int write_status = write(socketfd, encoded_data, strlen(encoded_data));
   if ( write_status < 0 ) {
     perror("erreur ecriture");
     exit(EXIT_FAILURE);
   }
+
+  // la réinitialisation de l'ensemble des données
+  memset(encoded_data, 0, sizeof(encoded_data));
+
+  // lire les données de la socket
+  int read_status = read(socketfd, encoded_data, sizeof(encoded_data));
+  if ( read_status < 0 ) {
+    perror("erreur lecture");
+    return -1;
+  }
+
+  printf("Message encodé: %s\n", encoded_data);
+
+  decode_JSON(encoded_data, data);
+  printf("Message recu: %s\n", data);
+ 
+  return 0;
 }
+
+/* 
+ * Fonction d'envoi et de réception de messages
+ * Il faut un argument : l'identifiant de la socket
+ */
 
 int envoie_recois_message(int socketfd) {
  
   char data[1024];
+  char encoded_data[1024];
   // la réinitialisation de l'ensemble des données
   memset(data, 0, sizeof(data));
+  memset(encoded_data, 0, sizeof(encoded_data));
 
 
   // Demandez à l'utilisateur d'entrer un message
@@ -52,25 +73,31 @@ int envoie_recois_message(int socketfd) {
   printf("Votre message (max 1000 caracteres): ");
   fgets(message, 1024, stdin);
   strcpy(data, "message: ");
+  message[strlen(message)-1] = '\0';
   strcat(data, message);
   
-  int write_status = write(socketfd, data, strlen(data));
+  encode_JSON(data, encoded_data);
+
+  int write_status = write(socketfd, encoded_data, strlen(encoded_data));
   if ( write_status < 0 ) {
     perror("erreur ecriture");
     exit(EXIT_FAILURE);
   }
 
   // la réinitialisation de l'ensemble des données
-  memset(data, 0, sizeof(data));
+  memset(encoded_data, 0, sizeof(encoded_data));
 
 
   // lire les données de la socket
-  int read_status = read(socketfd, data, sizeof(data));
+  int read_status = read(socketfd, encoded_data, sizeof(encoded_data));
   if ( read_status < 0 ) {
     perror("erreur lecture");
     return -1;
   }
 
+  printf("Message encodé: %s\n", encoded_data);
+
+  decode_JSON(encoded_data, data);
   printf("Message recu: %s\n", data);
  
   return 0;
@@ -86,13 +113,16 @@ int envoie_operateur_numeros(int socketfd, char *argv[]) {
   // Demandez à l'utilisateur d'entrer un message
   strcpy(data, "calcule: ");
   strcat(data, argv[2]);
-  strcat(data, " ");
+  strcat(data, ",");
   strcat(data, argv[3]);
-  strcat(data, " ");
+  strcat(data, ",");
   strcat(data, argv[4]);
 
   // lire les données de la socket
-  int write_status = write(socketfd, data, strlen(data));
+  char encoded_data[512];
+  encode_JSON(data, encoded_data);
+
+  int write_status = write(socketfd, encoded_data, strlen(encoded_data));
   if ( write_status < 0 ) {
     perror("erreur ecriture");
     exit(EXIT_FAILURE);
@@ -115,10 +145,13 @@ int envoie_couleurs(int socketfd, char *argv[]) {
   for (i = 3; i < nb + 3; ++i)
   {
     strcat(data, argv[i]);
-    strcat(data, " ");
+    strcat(data, ",");
   }
 
-  int write_status = write(socketfd, data, strlen(data));
+  char encoded_data[512];
+  encode_JSON(data, encoded_data);
+
+  int write_status = write(socketfd, encoded_data, strlen(encoded_data));
   if ( write_status < 0 ) {
     perror("erreur ecriture");
     exit(EXIT_FAILURE);
@@ -129,7 +162,9 @@ int envoie_couleurs(int socketfd, char *argv[]) {
 
 int envoie_balises(int socketfd, char *argv[]) {
   char data[1024];
+  char encoded_data[1024];
   memset(data, 0, sizeof(data));
+  memset(encoded_data, 0, sizeof(encoded_data));
   int nb = atoi(argv[2]);
 
   if (nb > 30)
@@ -143,10 +178,12 @@ int envoie_balises(int socketfd, char *argv[]) {
   for (i = 3; i < nb + 3; ++i)
   {
     strcat(data, argv[i]);
-    strcat(data, " ");
+    strcat(data, ",");
   }
 
-  int write_status = write(socketfd, data, strlen(data));
+  encode_JSON(data, encoded_data);
+
+  int write_status = write(socketfd, encoded_data, strlen(encoded_data));
   if ( write_status < 0 ) {
     perror("erreur ecriture");
     exit(EXIT_FAILURE);
@@ -186,8 +223,10 @@ void analyse(char *pathname, char *data, char *nb) {
 
 int envoie_images(int socketfd, char *nb, char *pathname) {
   char data[1024];
+  char encoded_data[1024];
   int intNb = atoi(nb);
   memset(data, 0, sizeof(data));
+  memset(encoded_data, 0, sizeof(encoded_data));
 
   if(intNb>30){
     perror("Nombre de couleurs demande trop grand");
@@ -195,11 +234,10 @@ int envoie_images(int socketfd, char *nb, char *pathname) {
   }
 
   analyse(pathname, data, nb);
-
-
-  printf("%s\n", data);
   
-  int write_status = write(socketfd, data, strlen(data));
+  encode_JSON(data, encoded_data);
+
+  int write_status = write(socketfd, encoded_data, strlen(encoded_data));
   if ( write_status < 0 ) {
     perror("erreur ecriture");
     exit(EXIT_FAILURE);
@@ -208,6 +246,57 @@ int envoie_images(int socketfd, char *nb, char *pathname) {
   return 0;
 }
 
+int encode_JSON(char* data, char* encoded_data){
+  printf("Message à encoder: %s\n", data);
+  
+  char * decoder = strtok(data, ": ");
+  sprintf(encoded_data, "{\"code\" : \"%s\", \"valeurs\" : [ ", decoder);
+
+  decoder = strtok(NULL, ": ");
+  decoder = strtok(decoder, ",");
+
+  while(decoder != NULL){
+    sprintf(encoded_data, "%s\"%s\", ", encoded_data, decoder);
+    decoder = strtok(NULL, ",");
+  }
+  encoded_data[strlen(encoded_data)-1] = '\0';
+  encoded_data[strlen(encoded_data)-1] = ' ';
+  
+  strcat(encoded_data, "]}");
+
+  printf("Message encodé envoyé: %s\n", encoded_data);
+  return 1;
+}
+
+int decode_JSON(char *data, char *decoded_data){
+  char data2[strlen(data)+1];
+  strcpy(data2, data);
+
+  // Isoler code d'instruction
+  char * decoder_code = strtok(data, ",");
+  decoder_code = strtok(decoder_code, " : ");
+  decoder_code = strtok(NULL, " : ");
+
+  // Supprimer les guillemets
+  memmove(decoder_code, decoder_code+1, strlen(decoder_code));
+  decoder_code[strlen(decoder_code)-1]='\0';
+
+  // Ajout de l'instruction a la chaine décodé
+  sprintf(decoded_data, "%s: ", decoder_code);
+
+  // Isoler les valeurs
+  char * decoder_valeurs = strtok(data2, "[");
+  decoder_valeurs = strtok(NULL, "[");
+
+  // Isoler chaque valeurs entre elles
+  char * decoder_valeur = strtok(decoder_valeurs, "\", \"");
+  while(decoder_valeur!=NULL) {
+    sprintf(decoded_data, "%s%s,", decoded_data, decoder_valeur);
+    decoder_valeur = strtok(NULL, "\", \"");
+  }
+  decoded_data[strlen(decoded_data)-4]='\0';
+  return 1;
+}
 
 int main(int argc, char **argv) {
   int socketfd;
