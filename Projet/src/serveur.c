@@ -15,6 +15,7 @@
 #include <unistd.h>
 
 #include "serveur.h"
+#include "validateur.h"
 
 void plot(char *data) {
   //Extraire le compteur et les couleurs RGB 
@@ -207,6 +208,11 @@ int recois_envoie_message(int socketfd) {
   printf ("Message reçu: %s\n", data);
   if (data_size < 0) {
     perror("erreur lecture");
+    return(EXIT_FAILURE);
+  }
+
+  if (!validateur_JSON(data)){
+    printf("ERROR");
     return(EXIT_FAILURE);
   }
 

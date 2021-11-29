@@ -15,6 +15,7 @@
 
 #include "client.h"
 #include "bmp.h"
+#include "validateur.h"
 
 int envoie_nom(int socketfd){
   char data[1024];
@@ -107,16 +108,18 @@ int envoie_operateur_numeros(int socketfd, char *argv[]) {
  
   char data[1024];
   char hostname[128];
+  int i = 2;
+
   // la réinitialisation de l'ensemble des données
   memset(data, 0, sizeof(data));
 
-  // Demandez à l'utilisateur d'entrer un message
   strcpy(data, "calcule: ");
-  strcat(data, argv[2]);
-  strcat(data, ",");
-  strcat(data, argv[3]);
-  strcat(data, ",");
-  strcat(data, argv[4]);
+  for (i; i <= sizeof(argv); i++)
+  {
+    strcat(data, argv[i]);
+    if(i != sizeof(argv))
+      strcat(data, ",");
+  }
 
   // lire les données de la socket
   char encoded_data[512];
@@ -252,7 +255,8 @@ int encode_JSON(char* data, char* encoded_data){
   char * decoder = strtok(data, ": ");
   sprintf(encoded_data, "{\"code\" : \"%s\", \"valeurs\" : [ ", decoder);
 
-  decoder = strtok(NULL, ": ");
+  decoder = strtok(NULL, ":");
+  memmove(decoder, decoder+1, strlen(decoder));
   decoder = strtok(decoder, ",");
 
   while(decoder != NULL){

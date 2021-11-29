@@ -16,5 +16,6 @@
  * en retour
  */
 int recois_envoie_message(int socketfd);
-
+int decode_JSON(char *data, char *decoded_data);
+int encode_JSON(char* data, char* encoded_data);
 #endif

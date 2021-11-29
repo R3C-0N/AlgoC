@@ -19,4 +19,6 @@
  */
 int envoie_recois_message(int socketfd);
 
+int decode_JSON(char *data, char *decoded_data);
+int encode_JSON(char* data, char* encoded_data);
 #endif
