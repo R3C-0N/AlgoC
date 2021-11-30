@@ -82,9 +82,10 @@ int renvoie_calcul(int client_socket_fd, char *data){
   char operateur;
   float  nombre1;
   float  nombre2;
+  float tabNombre[20];
   float resultat;
 
-  get_calcule_from_parameters(data, &operateur, &nombre1, &nombre2, &resultat);
+  get_calcule_from_parameters(data, &resultat);
 
   printf("calcule: %.2f\n", resultat);
   
@@ -95,36 +96,38 @@ int renvoie_calcul(int client_socket_fd, char *data){
   }
 }
 
-int get_calcule_from_parameters(char *parameters, char *operateur, float  *nombre1, float  *nombre2, float *resultat){
+int get_calcule_from_parameters(char *parameters, float *resultat){
+  char operateur;
+  float nombre1,nombre2;
   char * tableau = strtok(parameters, " ");
 
   tableau = strtok(NULL, " ");
-  *operateur = tableau[0];
+  operateur = tableau[0];
 
   tableau = strtok(tableau, ",");
   tableau = strtok(NULL, ",");
-  *nombre1 = atof(tableau);
+  nombre1 = atof(tableau);
 
   tableau = strtok(NULL, ",");
-  *nombre2 = atof(tableau);
+  nombre2 = atof(tableau);
 
-  switch(*operateur) {
+  switch(operateur) {
     case '-':
-      *resultat = *nombre1 - *nombre2;
+      *resultat = nombre1 - nombre2;
     break;
     case '/':
-      *resultat = *nombre1 / *nombre2;
+      *resultat = nombre1 / nombre2;
     break;
     case '*':
-      *resultat = *nombre1 * *nombre2;
+      *resultat = nombre1 * nombre2;
     break;
     case '+':
     default:
-      *resultat = *nombre1 + *nombre2;
+      *resultat = nombre1 + nombre2;
     break;
   }
 
-  printf("nb1: %f\nnb2: %f\nres: %f\n", *nombre1, *nombre2, *resultat);
+  printf("nb1: %f\nnb2: %f\nres: %f\n", nombre1, nombre2, *resultat);
  }
 
  int recois_couleurs(int client_socket_fd, char *data){
