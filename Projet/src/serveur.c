@@ -93,37 +93,51 @@ int renvoie_calcul(int client_socket_fd, char *data){
 }
 
 int get_calcule_from_parameters(char *parameters, float *resultat){
-  char operateur;
+  char operateur[20];
   float nombre1,nombre2;
+  float tabNombre[20];
   char * tableau = strtok(parameters, " ");
 
   tableau = strtok(NULL, " ");
-  operateur = tableau[0];
+  strcpy(operateur,tableau);
 
   tableau = strtok(tableau, ",");
-  tableau = strtok(NULL, ",");
-  nombre1 = atof(tableau);
 
+  int i = 0;
   tableau = strtok(NULL, ",");
-  nombre2 = atof(tableau);
+  while ( tableau != NULL ) {
+    tabNombre[i] = atof(tableau);
+    tableau = strtok(NULL, ",");
+    i++;
+  }
 
-  switch(operateur) {
+  switch(operateur[0]) {
     case '-':
-      *resultat = nombre1 - nombre2;
+      *resultat = tabNombre[0] - tabNombre[1];
     break;
     case '/':
-      *resultat = nombre1 / nombre2;
+      *resultat = tabNombre[0] / tabNombre[1];
     break;
     case '*':
-      *resultat = nombre1 * nombre2;
+      *resultat = tabNombre[0] * tabNombre[1];
     break;
     case '+':
+      *resultat = tabNombre[0] + tabNombre[1];
+    break;
+
     default:
-      *resultat = nombre1 + nombre2;
+      if(strcmp(operateur, "moyenne") == 0 )
+        printf("moyenne");
+      else if(strcmp(operateur, "minimum") == 0 )
+        printf("minimum");
+      else if(strcmp(operateur, "maximum") == 0 )
+        printf("maximum");
+      else if(strcmp(operateur, "ecart-type") == 0 )
+        printf("ecart-type");
     break;
   }
 
-  printf("nb1: %f\nnb2: %f\nres: %f\n", nombre1, nombre2, *resultat);
+  printf("nb1: %f\nnb2: %f\nres: %f\n", tabNombre[0], tabNombre[1], *resultat);
  }
 
  int recois_couleurs(int client_socket_fd, char *data){
