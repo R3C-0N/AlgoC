@@ -79,10 +79,6 @@ int renvoie_nom(int client_socket_fd, char *data){
 }
 
 int renvoie_calcul(int client_socket_fd, char *data){
-  char operateur;
-  float  nombre1;
-  float  nombre2;
-  float tabNombre[20];
   float resultat;
 
   get_calcule_from_parameters(data, &resultat);
