@@ -78,20 +78,16 @@ int renvoie_nom(int client_socket_fd, char *data){
   }
 }
 
-struct Calcul
-{
-    char operateur;
-    float  nombre1;
-    float  nombre2;
-    float resultat;
-};
-
 int renvoie_calcul(int client_socket_fd, char *data){
-  struct Calcul calcul;
-  get_calcule_from_parameters(data, &calcul);
+  char operateur;
+  float  nombre1;
+  float  nombre2;
+  float resultat;
 
-  printf("calcule: %.2f\n", calcul.resultat);
+  get_calcule_from_parameters(data, &operateur, &nombre1, &nombre2, &resultat);
 
+  printf("calcule: %.2f\n", resultat);
+  
   int data_size = write (client_socket_fd, (void *) data, strlen(data));
   if (data_size < 0) {
     perror("erreur ecriture");
@@ -99,34 +95,36 @@ int renvoie_calcul(int client_socket_fd, char *data){
   }
 }
 
-int get_calcule_from_parameters(char *parameters, struct Calcul* resultat){
+int get_calcule_from_parameters(char *parameters, char *operateur, float  *nombre1, float  *nombre2, float *resultat){
   char * tableau = strtok(parameters, " ");
 
   tableau = strtok(NULL, " ");
-  (*resultat).operateur = tableau[0];
+  *operateur = tableau[0];
 
   tableau = strtok(tableau, ",");
   tableau = strtok(NULL, ",");
-  (*resultat).nombre1 = atof(tableau);
+  *nombre1 = atof(tableau);
 
   tableau = strtok(NULL, ",");
-  (*resultat).nombre2 = atof(tableau);
+  *nombre2 = atof(tableau);
 
-  switch((*resultat).operateur) {
+  switch(*operateur) {
     case '-':
-      (*resultat).resultat = (*resultat).nombre1 - (*resultat).nombre2;
+      *resultat = *nombre1 - *nombre2;
     break;
     case '/':
-      (*resultat).resultat = (*resultat).nombre1 / (*resultat).nombre2;
+      *resultat = *nombre1 / *nombre2;
     break;
     case '*':
-      (*resultat).resultat = (*resultat).nombre1 * (*resultat).nombre2;
+      *resultat = *nombre1 * *nombre2;
     break;
     case '+':
     default:
-      (*resultat).resultat = (*resultat).nombre1 + (*resultat).nombre2;
+      *resultat = *nombre1 + *nombre2;
     break;
   }
+
+  printf("nb1: %f\nnb2: %f\nres: %f\n", *nombre1, *nombre2, *resultat);
  }
 
  int recois_couleurs(int client_socket_fd, char *data){

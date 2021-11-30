@@ -104,7 +104,7 @@ int envoie_recois_message(int socketfd) {
   return 0;
 }
 
-int envoie_operateur_numeros(int socketfd, char *argv[]) {
+int envoie_operateur_numeros(int socketfd, char *argv[], int argc) {
  
   char data[1024];
   char hostname[128];
@@ -112,15 +112,14 @@ int envoie_operateur_numeros(int socketfd, char *argv[]) {
 
   // la réinitialisation de l'ensemble des données
   memset(data, 0, sizeof(data));
-
   strcpy(data, "calcule: ");
-  for (i; i <= sizeof(argv); i++)
+  for (i; i <= argc-1; i++)
   {
     strcat(data, argv[i]);
-    if(i != sizeof(argv))
+    if(i !=  argc)
       strcat(data, ",");
   }
-
+  printf("Messag env: %s\n,", data);
   // lire les données de la socket
   char encoded_data[512];
   encode_JSON(data, encoded_data);
@@ -340,7 +339,7 @@ int main(int argc, char **argv) {
   }
 
   else if (!strcmp(argv[1], "calcule")) {
-    envoie_operateur_numeros(socketfd, argv);
+    envoie_operateur_numeros(socketfd, argv, argc);
   }
 
   else if (!strcmp(argv[1], "couleurs")) {
