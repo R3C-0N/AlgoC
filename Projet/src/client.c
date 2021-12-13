@@ -99,6 +99,17 @@ int envoie_recois_message(int socketfd) {
   printf("Message encodé: %s\n", encoded_data);
 
   decode_JSON(encoded_data, data);
+  int length = strlen(data);
+  int i;
+  for (i = 0; i < length; i++)
+  {
+    if (data[i]==',')
+    {
+      data[i]=' ';
+    }
+
+  }
+
   printf("Message recu: %s\n", data);
  
   return 0;
@@ -119,7 +130,6 @@ int envoie_operateur_numeros(int socketfd, char *argv[], int argc) {
     if(i !=  argc)
       strcat(data, ",");
   }
-  printf("Messag env: %s\n,", data);
   // lire les données de la socket
   char encoded_data[512];
   encode_JSON(data, encoded_data);
@@ -328,7 +338,7 @@ int main(int argc, char **argv) {
     perror("connection serveur");
     exit(EXIT_FAILURE);
   }
-  //envoie_recois_message(socketfd);
+
 
   if (!strcmp(argv[1],"message")) {
     envoie_recois_message(socketfd);
