@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <math.h> 
 
 #include "serveur.h"
 #include "validateur.h"
@@ -92,23 +93,59 @@ int renvoie_calcul(int client_socket_fd, char *data){
   }
 }
 
+float moyenne(float tab[], int nb){
+    int i;
+    float moyenne = 0;
+    for (i = 0 ; i < nb ; i++)
+        moyenne += (float)tab[i];
+    return moyenne/nb;
+}
+
+float min(float tab[], int nb){
+    int i;
+    float min = tab[0];
+    for (i = 1 ; i < nb ; i++)
+        if(tab[i] < min)
+          min = tab[i];
+    return min;
+}
+
+float max(float tab[], int nb){
+    int i;
+    float max = tab[0];
+    for (i = 1 ; i < nb ; i++)
+        if(tab[i] > max)
+          max = tab[i];
+    return max;
+}
+
+float ecartType(float tab[], int nb){
+    int i;
+    float moy = moyenne(tab,nb);
+    float somme = 0;
+    for (i = 0 ; i < nb ; i++)
+        somme += powf(tab[i] - moy,2);
+    return sqrt(somme/nb);
+}
+
 int get_calcule_from_parameters(char *parameters, float *resultat){
   char operateur[20];
   float nombre1,nombre2;
   float tabNombre[20];
   char * tableau = strtok(parameters, " ");
+  int nb = 0;
 
   tableau = strtok(NULL, " ");
-  strcpy(operateur,tableau);
 
   tableau = strtok(tableau, ",");
-
+  strcpy(operateur,tableau);
   int i = 0;
   tableau = strtok(NULL, ",");
   while ( tableau != NULL ) {
     tabNombre[i] = atof(tableau);
     tableau = strtok(NULL, ",");
     i++;
+    nb++;
   }
 
   switch(operateur[0]) {
@@ -127,17 +164,15 @@ int get_calcule_from_parameters(char *parameters, float *resultat){
 
     default:
       if(strcmp(operateur, "moyenne") == 0 )
-        printf("moyenne");
+        *resultat = moyenne(tabNombre, nb);
       else if(strcmp(operateur, "minimum") == 0 )
-        printf("minimum");
+        *resultat = min(tabNombre, nb);
       else if(strcmp(operateur, "maximum") == 0 )
-        printf("maximum");
+        *resultat = max(tabNombre, nb);
       else if(strcmp(operateur, "ecart-type") == 0 )
-        printf("ecart-type");
+        *resultat = ecartType(tabNombre, nb);
     break;
   }
-
-  printf("nb1: %f\nnb2: %f\nres: %f\n", tabNombre[0], tabNombre[1], *resultat);
  }
 
  int recois_couleurs(int client_socket_fd, char *data){

@@ -12,7 +12,7 @@ VALIDATEUR = VALIDATEUR
 all: $(SERVER) $(CLIENT)
 
 $(SERVER): $(SOBJS)
-	$(CC) -o $(SERVER) $(SOBJS)
+	$(CC) -o $(SERVER) $(SOBJS) -lm
 
 $(CLIENT): $(COBJS)
 	$(CC) -o $(CLIENT) $(COBJS)
