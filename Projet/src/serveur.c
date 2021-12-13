@@ -5,7 +5,7 @@
  *
  */
 
-#include <sys/types.h> 
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <sys/epoll.h>
 #include <netinet/in.h>
@@ -18,7 +18,7 @@
 #include "validateur.h"
 
 void plot(char *data) {
-  //Extraire le compteur et les couleurs RGB 
+  //Extraire le compteur et les couleurs RGB
   FILE *p = popen("gnuplot -persist", "w");
   printf("Plot\n");
   int count = 0;
@@ -60,7 +60,7 @@ int renvoie_message(int client_socket_fd, char *data) {
   char encoded_data[1024];
   encode_JSON(data, encoded_data);
   int data_size = write (client_socket_fd, encoded_data, strlen(encoded_data));
-      
+
   if (data_size < 0) {
     perror("erreur ecriture");
     return(EXIT_FAILURE);
@@ -71,7 +71,7 @@ int renvoie_nom(int client_socket_fd, char *data){
   char encoded_data[1024];
   encode_JSON(data, encoded_data);
   int data_size = write(client_socket_fd, encoded_data, strlen(encoded_data));
-  
+
   if (data_size < 0) {
     perror("erreur ecriture");
     return(EXIT_FAILURE);
@@ -190,7 +190,7 @@ int recois_envoie_message(int socketfd) {
   char decoded_data[1024];
 
   int client_addr_len = sizeof(client_addr);
- 
+
   // nouvelle connection de client
   int client_socket_fd = accept(socketfd, (struct sockaddr *) &client_addr, &client_addr_len);
   if (client_socket_fd < 0 ) {
@@ -204,28 +204,29 @@ int recois_envoie_message(int socketfd) {
 
   //lecture de données envoyées par un client
   int data_size = read (client_socket_fd, (void *) data, sizeof(data));
-  
-  printf ("Message reçu: %s\n", data);
+
+  printf("Message reçu: %s\n", data);
   if (data_size < 0) {
     perror("erreur lecture");
     return(EXIT_FAILURE);
   }
 
   if (!validateur_JSON(data)){
-    printf("ERROR");
+    int data_size = write(client_socket_fd, "{\"code\" : \"error\", \"valeurs\" : [ \"invalid\", \"JSON\" ]}", 53);
+    close(socketfd);
     return(EXIT_FAILURE);
   }
 
   decode_JSON(data, decoded_data);
-  
+
   /*
-   * extraire le code des données envoyées par le client. 
+   * extraire le code des données envoyées par le client.
    * Les données envoyées par le client peuvent commencer par le mot "message :" ou un autre mot.
    */
   printf ("Message décodé: %s\n", decoded_data);
   char code[10];
   sscanf(decoded_data, "%s", code);
-  //Si le message commence par le mot: 'message:' 
+  //Si le message commence par le mot: 'message:'
   if (strcmp(code, "message:") == 0) {
     renvoie_message(client_socket_fd, decoded_data);
   }
@@ -246,7 +247,7 @@ int recois_envoie_message(int socketfd) {
     plot(decoded_data);
   }
 ;
-  //fermer le socket 
+  //fermer le socket
   close(socketfd);
 }
 
@@ -283,22 +284,27 @@ int decode_JSON(char *data, char *decoded_data){
 
 int encode_JSON(char* data, char* encoded_data){
   printf("Message à encoder: %s\n", data);
-  
+  printf("%i\n", __LINE__);
+
   char * decoder = strtok(data, ": ");
   sprintf(encoded_data, "{\"code\" : \"%s\", \"valeurs\" : [ ", decoder);
 
+  printf("%i\n", __LINE__);
   decoder = strtok(NULL, ": ");
   decoder = strtok(decoder, ",");
 
+  printf("%i\n", __LINE__);
   while(decoder != NULL){
     sprintf(encoded_data, "%s\"%s\", ", encoded_data, decoder);
     decoder = strtok(NULL, ",");
   }
   encoded_data[strlen(encoded_data)-1] = '\0';
   encoded_data[strlen(encoded_data)-1] = ' ';
-  
+
+  printf("%i\n", __LINE__);
   strcat(encoded_data, "]}");
 
+  printf("%i\n", __LINE__);
   printf("Message encodé envoyé: %s\n", encoded_data);
   return 1;
 }
@@ -336,7 +342,7 @@ int main() {
       perror("bind");
       return(EXIT_FAILURE);
     }
- 
+
       // Écouter les messages envoyés par le client
     listen(socketfd, 10);
 

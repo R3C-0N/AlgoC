@@ -1,0 +1,1 @@
+/usr/bin/cc  -g   CMakeFiles/AlgoC.dir/Projet/src/serveur.c.o CMakeFiles/AlgoC.dir/Projet/src/client.c.o CMakeFiles/AlgoC.dir/Projet/src/bmp.c.o CMakeFiles/AlgoC.dir/Projet/src/couleur.c.o CMakeFiles/AlgoC.dir/Projet/src/validateur.c.o  -o AlgoC 

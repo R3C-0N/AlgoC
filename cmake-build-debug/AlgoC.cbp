@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="AlgoC"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="AlgoC">
+				<Option output="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/AlgoC" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/Projet/src"/>
+					<Add directory="/usr/include/c++/6"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/6"/>
+					<Add directory="/usr/include/c++/6/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/6/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/6/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 AlgoC"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="AlgoC/fast">
+				<Option output="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/AlgoC" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/Projet/src"/>
+					<Add directory="/usr/include/c++/6"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/6"/>
+					<Add directory="/usr/include/c++/6/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/6/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/6/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 AlgoC/fast"/>
+					<CompileFile command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j8 -f &quot;/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/Projet/src/bmp.c">
+			<Option target="AlgoC"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/Projet/src/bmp.h">
+			<Option target="AlgoC"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/Projet/src/client.c">
+			<Option target="AlgoC"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/Projet/src/client.h">
+			<Option target="AlgoC"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/Projet/src/couleur.c">
+			<Option target="AlgoC"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/Projet/src/couleur.h">
+			<Option target="AlgoC"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/Projet/src/serveur.c">
+			<Option target="AlgoC"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/Projet/src/serveur.h">
+			<Option target="AlgoC"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/Projet/src/validateur.c">
+			<Option target="AlgoC"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/Projet/src/validateur.h">
+			<Option target="AlgoC"/>
+		</Unit>
+		<Unit filename="/mnt/c/Users/recon/Documents/Cours/3IRC/AlgoC/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>

@@ -99,6 +99,17 @@ int envoie_recois_message(int socketfd) {
   printf("Message encodé: %s\n", encoded_data);
 
   decode_JSON(encoded_data, data);
+  int length = strlen(data);
+  int i;
+  for (i = 0; i < length; i++)
+  {
+    if (data[i]==',')
+    {
+      data[i]=' ';
+    }
+    
+  }
+  
   printf("Message recu: %s\n", data);
  
   return 0;
@@ -107,17 +118,17 @@ int envoie_recois_message(int socketfd) {
 int envoie_operateur_numeros(int socketfd, char *argv[]) {
  
   char data[1024];
-  char hostname[128];
-  int i = 2;
+  int i;
+  size_t size = sizeof(argv);
 
   // la réinitialisation de l'ensemble des données
-  memset(data, 0, sizeof(data));
+  memset(data, 0, size);
 
   strcpy(data, "calcule: ");
-  for (i; i <= sizeof(argv); i++)
+  for (i = 2;i <= size; i++)
   {
     strcat(data, argv[i]);
-    if(i != sizeof(argv))
+    if(i != size)
       strcat(data, ",");
   }
 
@@ -136,6 +147,7 @@ int envoie_couleurs(int socketfd, char *argv[]) {
   char data[1024];
   memset(data, 0, sizeof(data));
   int nb = atoi(argv[2]);
+  
 
   if (nb > 30)
   {
@@ -143,12 +155,17 @@ int envoie_couleurs(int socketfd, char *argv[]) {
     exit(EXIT_FAILURE);
   }
 
+
   strcpy(data, "couleurs: ");
+  
   int i;
   for (i = 3; i < nb + 3; ++i)
   {
+  printf("ERREUR: %i\n", __LINE__);
+  printf("DATA: %s\n", argv[i]);
     strcat(data, argv[i]);
     strcat(data, ",");
+  printf("ERREUR: %i\n", __LINE__);
   }
 
   char encoded_data[512];
@@ -329,7 +346,7 @@ int main(int argc, char **argv) {
     perror("connection serveur");
     exit(EXIT_FAILURE);
   }
-  //envoie_recois_message(socketfd);
+  
 
   if (!strcmp(argv[1],"message")) {
     envoie_recois_message(socketfd);
@@ -344,6 +361,7 @@ int main(int argc, char **argv) {
   }
 
   else if (!strcmp(argv[1], "couleurs")) {
+    printf("ARGV: %s %s %s %s\n", argv[0], argv[1], argv[2], argv[3]);
     envoie_couleurs(socketfd, argv);
   }
 
