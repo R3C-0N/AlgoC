@@ -148,6 +148,7 @@ int get_calcule_from_parameters(char *parameters, float *resultat){
     nb++;
   }
 
+
   switch(operateur[0]) {
     case '-':
       *resultat = tabNombre[0] - tabNombre[1];
