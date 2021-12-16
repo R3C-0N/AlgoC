@@ -1,6 +1,16 @@
 # Bibliothèques
-* 
-*
+*unistd
+*stdio
+*stdlib
+*sys/types
+*sys/stat
+*sys/socket
+*netinet/in
+*search
+*unistd
+*fcntl
+*math
+*string
 
 # Références
 *
@@ -10,6 +20,9 @@
 *
 
 # Commentaires
-* 
-* 
-
+* Liste des commandes utilisable :
+*message 
+*nom
+*calcule
+*couleurs
+*balises
